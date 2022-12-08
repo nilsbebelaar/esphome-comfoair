@@ -5,6 +5,18 @@ startBytes = bytearray([0x07, 0xF0])
 stopBytes = bytearray([0x07, 0x0F])
 AckBytes = bytearray([0x07, 0xF3])
 
+level = 0
+comfort_temp = 12
+level_preset_0_in = 0
+level_preset_0_out = 0
+level_preset_1_in = 40
+level_preset_1_out = 40
+level_preset_2_in = 80
+level_preset_2_out = 80
+level_preset_3_in = 100
+level_preset_3_out = 100
+
+
 def main():
     ser = serial.Serial(COM_PORT, timeout=1)
     while True:
@@ -35,6 +47,16 @@ def main():
 
 
 def genResponse(command, data):
+    global level
+    global comfort_temp
+    global level_preset_0_in
+    global level_preset_0_out
+    global level_preset_1_in
+    global level_preset_1_out
+    global level_preset_2_in
+    global level_preset_2_out
+    global level_preset_3_in
+    global level_preset_3_out
     command = command[0]*256+command[1]
     resCommand = bytearray(2)
     resData = bytearray(0)
@@ -42,7 +64,7 @@ def genResponse(command, data):
     match command:
         case 0x0067:  # Bootloader Version Read
             resCommand = bytearray([0x00, 0x68])
-            resData = bytearray([0x01, 0x01, 0x00, 0x43, 0x41, 0x33, 0x35, 0x30, 0x20, 0x6C, 0x75, 0x78, 0x65])
+            resData = bytearray([0x05, 0x10, 0x50, 0x43, 0x41, 0x33, 0x35, 0x30, 0x20, 0x6C, 0x75, 0x78, 0x65])
         case 0x0069:  # Firmware Version Read
             resCommand = bytearray([0x00, 0x6A])
             resData = bytearray([0x03, 0x14, 0x20, 0x43, 0x41, 0x33, 0x35, 0x30, 0x20, 0x6C, 0x75, 0x78, 0x65])
@@ -66,10 +88,23 @@ def genResponse(command, data):
             resData = bytearray([0x00])
         case 0x00CD:  # Ventilation Levels Read
             resCommand = bytearray([0x00, 0xCE])
-            resData = bytearray([0, 20, 20, 0, 50, 50, 80, 80, 4, 1, 100, 100, 0, 0])
+            resData = bytearray([level_preset_0_out,
+                                 level_preset_1_out,
+                                 level_preset_2_out,
+                                 level_preset_0_in,
+                                 level_preset_1_in,
+                                 level_preset_2_in,
+                                 80,
+                                 80,
+                                 level,
+                                 1,
+                                 level_preset_3_out,
+                                 level_preset_3_in,
+                                 0,
+                                 0])
         case 0x00D1:  # Temperatures Read
             resCommand = bytearray([0x00, 0xD2])
-            resData = bytearray([int((16+20)*2), int((11+20)*2), int((18+20)*2), int((15+20)*2), int((13+20)*2), 0b00001111, 0, 0, 0])
+            resData = bytearray([int((comfort_temp+20)*2), int((11+20)*2), int((18+20)*2), int((15+20)*2), int((13+20)*2), 0b00001111, 0, 0, 0])
         case 0x00D5:  # Status Read
             resCommand = bytearray([0x00, 0xD6])
             resData = bytearray([0, 1, 1, 2, 0b00000000, 0x00, 0x00, 0x00, 0x00, 0, 0])
@@ -87,20 +122,30 @@ def genResponse(command, data):
             resCommand = bytearray([0x00, 0xE2])
             resData = bytearray([2, 0, 0, *int(60).to_bytes(2), 1])
         case 0x0099:  # Ventilation Level Set
-            print(f'Setting Ventilation Level to {int(data[0])-1}')
+            level = int(data[0])
+            print(f'Setting Ventilation Level to {hex(level)}')
             sendResponse = False
         case 0x00CF:  # Ventilation Presets Set
+            level_preset_0_out = data[0]
+            level_preset_0_in = data[3]
+            level_preset_1_out = data[1]
+            level_preset_1_in = data[4]
+            level_preset_2_out = data[2]
+            level_preset_2_in = data[5]
+            level_preset_3_out = data[6]
+            level_preset_3_in = data[7]
             print(f'Setting Level 0 exhaust %: {data[0]}')
-            print(f'Setting Level 0 intake %: {data[3]}')
+            print(f'Setting Level 0 intake %:  {data[3]}')
             print(f'Setting Level 1 exhaust %: {data[1]}')
-            print(f'Setting Level 1 intake %: {data[4]}')
+            print(f'Setting Level 1 intake %:  {data[4]}')
             print(f'Setting Level 2 exhaust %: {data[2]}')
-            print(f'Setting Level 2 intake %: {data[5]}')
+            print(f'Setting Level 2 intake %:  {data[5]}')
             print(f'Setting Level 3 exhaust %: {data[6]}')
-            print(f'Setting Level 3 intake %: {data[7]}')
+            print(f'Setting Level 3 intake %:  {data[7]}')
             sendResponse = False
         case 0x00D3:  # Temperature Set
-            print(f'Setting Comfort Temperature to {int(data[0])/2-20}')
+            comfort_temp = int(data[0])/2-20
+            print(f'Setting Comfort Temperature to {comfort_temp}')
             sendResponse = False
 
     return resCommand, resData, sendResponse
