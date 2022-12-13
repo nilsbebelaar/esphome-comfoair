@@ -8,6 +8,9 @@
 #include "esphome/components/climate/climate_traits.h"
 #include "esphome/components/custom/climate/custom_climate.h"
 
+#define MIN_COMFORT_TEMP 12
+#define MAX_COMFORT_TEMP 29
+
 namespace esphome
 {
   namespace comfoair
@@ -131,8 +134,8 @@ namespace esphome
       climate::ClimateTraits traits() override
       {
         auto traits = climate::ClimateTraits();
-        traits.set_visual_min_temperature(12);
-        traits.set_visual_max_temperature(29);
+        traits.set_visual_min_temperature(MIN_COMFORT_TEMP);
+        traits.set_visual_max_temperature(MAX_COMFORT_TEMP);
         traits.set_visual_temperature_step(0.5f);
         traits.set_supported_fan_modes({climate::CLIMATE_FAN_AUTO,
                                         climate::CLIMATE_FAN_LOW,
@@ -298,7 +301,7 @@ namespace esphome
 
       void set_comfort_temperature_(float temperature)
       {
-        if (temperature < 12.0f || temperature > 29.0f)
+        if (temperature < (float)MIN_COMFORT_TEMP || temperature > (float)MAX_COMFORT_TEMP)
         {
           ESP_LOGI(TAG, "Ignoring invalid temperature request: %i", temperature);
           return;
