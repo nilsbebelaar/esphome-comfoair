@@ -12,7 +12,6 @@ namespace esphome
 {
   namespace comfoair
   {
-
     static const char *TAG = "comfoair";
 
     static const uint8_t COMFOAIR_MSG_HEAD_LENGTH = 5;
@@ -132,24 +131,14 @@ namespace esphome
       climate::ClimateTraits traits() override
       {
         auto traits = climate::ClimateTraits();
-        traits.set_supports_current_temperature(false);
-        traits.set_supported_modes({climate::CLIMATE_MODE_FAN_ONLY});
-        traits.set_supports_two_point_target_temperature(false);
-        traits.set_supported_presets({
-            climate::CLIMATE_PRESET_HOME,
-        });
-        traits.set_supports_action(false);
         traits.set_visual_min_temperature(12);
         traits.set_visual_max_temperature(29);
-        traits.set_visual_temperature_step(1);
-        traits.set_supported_fan_modes({
-            climate::CLIMATE_FAN_FOCUS,
-            climate::CLIMATE_FAN_AUTO,
-            climate::CLIMATE_FAN_LOW,
-            climate::CLIMATE_FAN_MEDIUM,
-            climate::CLIMATE_FAN_HIGH,
-            climate::CLIMATE_FAN_OFF,
-        });
+        traits.set_visual_temperature_step(0.5f);
+        traits.set_supported_fan_modes({climate::CLIMATE_FAN_AUTO,
+                                        climate::CLIMATE_FAN_LOW,
+                                        climate::CLIMATE_FAN_MEDIUM,
+                                        climate::CLIMATE_FAN_HIGH,
+                                        climate::CLIMATE_FAN_OFF});
         return traits;
       }
 
@@ -163,9 +152,6 @@ namespace esphome
           this->fan_mode = *call.get_fan_mode();
           switch (this->fan_mode.value())
           {
-          case climate::CLIMATE_FAN_FOCUS:
-            level = 0x05;
-            break;
           case climate::CLIMATE_FAN_HIGH:
             level = 0x04;
             break;
@@ -181,6 +167,7 @@ namespace esphome
           case climate::CLIMATE_FAN_AUTO:
             level = 0x00;
             break;
+          case climate::CLIMATE_FAN_FOCUS:
           case climate::CLIMATE_FAN_ON:
           case climate::CLIMATE_FAN_MIDDLE:
           case climate::CLIMATE_FAN_DIFFUSE:
@@ -269,7 +256,6 @@ namespace esphome
           auto check = this->check_byte_();
           if (!check.has_value())
           {
-
             // finished
             if (this->data_[COMFOAIR_MSG_ACK_IDX] != COMFOAIR_MSG_ACK)
               this->parse_data_();
