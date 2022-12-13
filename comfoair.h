@@ -515,7 +515,6 @@ namespace esphome
         }
         case COMFOAIR_GET_TEMPERATURES_RESPONSE:
         {
-
           // comfort temperature
           this->target_temperature = (float)msg[0] / 2.0f - 20.0f;
           this->current_temperature = (float)msg[2] / 2.0f - 20.0f;
@@ -624,10 +623,14 @@ namespace esphome
       }
 
       uint8_t get_uint8_t_(uint8_t start_index) const
-          return this->data_[COMFOAIR_MSG_HEAD_LENGTH + start_index];
+      {
+        return this->data_[COMFOAIR_MSG_HEAD_LENGTH + start_index];
+      }
 
       uint16_t get_uint16_(uint8_t start_index) const
-          return (uint16_t(this->data_[COMFOAIR_MSG_HEAD_LENGTH + start_index + 1] | this->data_[COMFOAIR_MSG_HEAD_LENGTH + start_index] << 8));
+      {
+        return (uint16_t(this->data_[COMFOAIR_MSG_HEAD_LENGTH + start_index + 1] | this->data_[COMFOAIR_MSG_HEAD_LENGTH + start_index] << 8));
+      }
 
       uint8_t data_[30];
       uint8_t data_index_{0};
