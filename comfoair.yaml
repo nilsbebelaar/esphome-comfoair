@@ -1,13 +1,17 @@
+substitutions:
+  node_name: whr950
+  device_name: whr950
+
 esphome:
-  name: comfoair
+  name: ${device_name}
   platform: ESP8266
-  board: esp01_1m
+  board: nodemcuv2
   includes:
     - comfoair.h
 
 wifi:
-  ssid: 'your-wifi-ssid-here'
-  password: 'put-your-wifi-password-here'
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
 
 # Disable uart logging
 logger:
