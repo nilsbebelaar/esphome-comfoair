@@ -1,19 +1,29 @@
+substitutions:
+  node_name: ComfoAir950
+  device_name: comfoair950
+
 esphome:
-  name: comfoair
+  name: ${device_name}
   platform: ESP8266
-  board: esp01_1m
-  includes:
-    - comfoair.h
+  board: nodemcuv2
 
 external_components:
   - source:
       type: git
-      url: https://github.com/nyxnyx/esphome-comfoair
+      url: https://github.com/nilsbebelaar/esphome-comfoair
+      ref: comfoair-new
     components: [comfoair]
 
 wifi:
-  ssid: 'your-wifi-ssid-here'
-  password: 'put-your-wifi-password-here'
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${node_name}
+    ap_timeout: 15s
+
+captive_portal:
 
 # Disable uart logging
 logger:
@@ -21,7 +31,6 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: 'set-an-api-password-here'
 
 ota:
 
@@ -35,49 +44,49 @@ uart:
   rx_pin: RX 
 
 comfoair:
-  name: "ComfoAir 350"
+  name: "ComfoAir 950"
   uart_id: uart_bus
-  fan_supply_air_percentage:
+  comfoair_fan_supply_air_percentage:
     name: "Fan supply (%)"
-  fan_exhaust_air_percentage:
+  comfoair_fan_exhaust_air_percentage:
     name: "Fan exhaust (%)"
-  fan_speed_supply:
+  comfoair_fan_speed_supply:
     name: "Supply fan speed"
-  fan_speed_exhaust:
+  comfoair_fan_speed_exhaust:
     name: "Exhaust fan speed"
-  is_bypass_valve_open:
+  comfoair_is_bypass_valve_open:
     name: "Is bypas open?"
-  is_preheating:
-    name: "is preheating active?"
-  outside_air_temperature:
+  comfoair_is_preheating:
+    name: "Is preheating active?"
+  comfoair_outside_air_temperature:
     name: "Outside temperature"
-  supply_air_temperature:
+  comfoair_supply_air_temperature:
     name: "Supply temperature"
-  return_air_temperature:
+  comfoair_return_air_temperature:
     name: "Return temperature"
-  exhaust_air_temperature:
+  comfoair_exhaust_air_temperature:
     name: "Exhaust temperature"
-  enthalpy_temperature:
+  comfoair_enthalpy_temperature:
     name: "Enthalpy temperature"
-  ewt_temperature:
+  comfoair_ewt_temperature:
     name: "EWT temperature "
-  reheating_temperature:
+  comfoair_reheating_temperature:
     name: "Reheating temperature"
-  kitchen_hood_temperature:
+  comfoair_kitchen_hood_temperature:
     name: "Kitchen hood temperature"
-  return_air_level:
+  comfoair_return_air_level:
     name: "Return level"
-  supply_air_level:
+  comfoair_supply_air_level:
     name: "Supply level"
-  is_supply_fan_active:
+  comfoair_is_supply_fan_active:
     name: "Is supply fan active?"
-  is_filter_full:
+  comfoair_is_filter_full:
     name: "Is filter full?"
-  bypass_factor:
+  comfoair_bypass_factor:
     name: "Bypass factor"
-  bypass_step:
+  comfoair_bypass_step:
     name: "Bypass step"
-  bypass_correction:
+  comfoair_bypass_correction:
     name: "Bypass correction"
-  is_summer_mode:
+  comfoair_is_summer_mode:
     name: "Is summer mode?"
